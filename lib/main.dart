@@ -65,12 +65,13 @@ class _MyHomePageState extends State<MyHomePage> {
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_localization_app/constant/Constant.dart';
 import 'package:flutter_localization_app/localization/localizations.dart';
-import 'package:flutter_localization_app/model/RadioModel.dart';
+
 import 'package:flutter_localization_app/screen/SplashScreen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'screen/SecondScreen.dart';
+
 
 void main() => runApp(MyApp());
 
@@ -128,7 +129,8 @@ class _MyAppState extends State<MyApp> {
           ],
           locale: locale,
           routes: <String, WidgetBuilder>{
-            HOME_SCREEN: (BuildContext context) => new HomeScreen(),
+            '/home': (BuildContext context) => new HomeScreen(),
+            '/Second_Screen': (BuildContext context) => new SecondScreen(),
           });
     }
   }
@@ -160,21 +162,15 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
-  List<RadioModel> _langList = new List<RadioModel>();
 
-  int _index=0;
 
   @override
   void initState() {
     super.initState();
 
-    _initLanguage();
-
   }
 
-  bool isDevicePlatformAndroid() {
-    return Theme.of(context).platform == TargetPlatform.android;
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -182,7 +178,7 @@ class _HomeScreenState extends State<HomeScreen> {
         key: _scaffoldKey,
         backgroundColor: const Color(0xFFF6F8FA),
         appBar: AppBar(
-          elevation: isDevicePlatformAndroid() ? 0.2 : 0.0,
+          elevation: 0.2 ,
           backgroundColor: const Color(0xFFF6F8FA),
           title: new Center(
             child: new Text(
@@ -198,7 +194,15 @@ class _HomeScreenState extends State<HomeScreen> {
             child: new Column(
           children: <Widget>[
             _buildMainWidget(),
-            _buildLanguageWidget(),
+//            _buildLanguageWidget(),
+            Row(
+              children: <Widget>[
+                FlatButton(onPressed: setHindi, child: Text("Hindi"),),
+                FlatButton(onPressed: setEnglish, child: Text("English")),
+                FlatButton(onPressed: () => Navigator.of(context).pushReplacementNamed('/Second_Screen'), child: Text("Second Screen")),
+
+              ],
+            )
           ],
         )));
   }
@@ -269,45 +273,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildLanguageWidget() {
-    return new Flexible(
-      child: Container(
-        padding: EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 4.0),
-        margin: EdgeInsets.only(left: 4.0, right: 4.0),
-        color: Colors.grey[100],
-        child: ListView.builder(
-          itemCount: _langList.length,
-          scrollDirection: Axis.horizontal,
-          itemBuilder: (BuildContext context, int index) {
-            return new InkWell(
-              splashColor: Colors.blueAccent,
-              onTap: () {
-                setState(() {
-                  _langList.forEach((element) => element.isSelected = false);
-                  _langList[index].isSelected = true;
-                  _index = index;
-                  _handleRadioValueChanged();
-                });
-              },
-              child: new RadioItem(_langList[index]),
-            );
-          },
-        ),
-      ),
-    );
-  }
 
-  List<RadioModel> _getLangList() {
-    if(_index==0) {
-      _langList.add(new RadioModel(true, 'English'));
-      _langList.add(new RadioModel(false, 'हिंदी'));
-    } else if(_index==1) {
-      _langList.add(new RadioModel(false, 'English'));
-      _langList.add(new RadioModel(true, 'हिंदी'));
-    }
 
-    return _langList;
-  }
+
 
   Future<String> _getLanguageCode() async {
     var prefs = await SharedPreferences.getInstance();
@@ -318,35 +286,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return prefs.getString('languageCode');
   }
 
-  void _initLanguage() async {
-    Future<String> status = _getLanguageCode();
-    status.then((result) {
-      if (result != null && result.compareTo('en') == 0) {
-        setState(() {
-          _index = 0;
-        });
-      }
-      if (result != null && result.compareTo('hi') == 0) {
-        setState(() {
-          _index = 1;
-        });
-      } else {
-        setState(() {
-          _index = 0;
-        });
-      }
-      print("INDEX: $_index");
 
-      _setupLangList();
-    });
-  }
 
-  void _setupLangList() {
-    setState(() {
-      _langList.add(new RadioModel(_index==0?true:false, 'English'));
-      _langList.add(new RadioModel(_index==0?false:true, 'हिंदी'));
-    });
-  }
+
 
   void _updateLocale(String lang, String country) async {
     print(lang + ':' + country);
@@ -358,75 +300,21 @@ class _HomeScreenState extends State<HomeScreen> {
     MyApp.setLocale(context, Locale(lang, country));
   }
 
-  void _handleRadioValueChanged() {
-    print("SELCET_VALUE: " + _index.toString());
-    setState(() {
-      switch (_index) {
-        case 0:
-          print("English");
-          _updateLocale('en', '');
-          break;
-        case 1:
-          print("Hindi");
-          _updateLocale('hi', '');
-          break;
-      }
-    });
+
+  void setHindi(){
+    _updateLocale('hi', '');
   }
+
+  void setEnglish(){
+    _updateLocale('en', '');
+  }
+
+
+
+
 
 
 }
 
-class RadioItem extends StatelessWidget {
-  final RadioModel _item;
 
-  RadioItem(this._item);
 
-  @override
-  Widget build(BuildContext context) {
-    return new Container(
-      padding: EdgeInsets.fromLTRB(4.0, 4.0, 4.0, 4.0),
-      margin: EdgeInsets.only(left: 4.0, right: 4.0),
-      color: Colors.grey[100],
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Container(
-            margin: EdgeInsets.only(left: 4.0, right: 4.0),
-            child: new Column(
-              mainAxisSize: MainAxisSize.max,
-              children: <Widget>[
-                new Container(
-                  width: 60.0,
-                  height: 4.0,
-                  decoration: new BoxDecoration(
-                    color: _item.isSelected
-                        ? Colors.redAccent
-                        : Colors.transparent,
-                    border: new Border.all(
-                        width: 1.0,
-                        color: _item.isSelected
-                            ? Colors.redAccent
-                            : Colors.transparent),
-                    borderRadius:
-                        const BorderRadius.all(const Radius.circular(2.0)),
-                  ),
-                ),
-                new Container(
-                  margin: new EdgeInsets.only(top: 8.0),
-                  child: new Text(
-                    _item.title,
-                    style: TextStyle(
-                      color:
-                          _item.isSelected ? Colors.redAccent : Colors.black54,
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}

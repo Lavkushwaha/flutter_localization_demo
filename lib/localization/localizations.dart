@@ -17,6 +17,8 @@ class AppLocalizations {
       'appName': 'Localization Demo',
       'appNameShort': 'Localization',
       'title': 'FlutterDevs',
+      'lang':'English',
+      'secondTitle':'Second Screen',
       'desc': 'FlutterDevs intent to deliver Flutter apps with '
           'high quality. We’ve adopted Design First attitude '
           'which helps us deliver applications of highest quality.',
@@ -25,6 +27,8 @@ class AppLocalizations {
       'appName': 'लोकलाइजेशन डेमो',
       'appNameShort': 'लोकलाइजेशन',
       'title': 'फ्लूटेरडेव्स',
+      'secondTitle':'दूसरी स्क्रीन',
+      'lang':'डेव्स',
       'desc': 'FlutterDevs उच्च गुणवत्ता वाले Flutter ऐप्स वितरित करने '
           'का इरादा रखता है। हमने डिजाइन फर्स्ट रवैया अपनाया है जो हमें '
           'उच्चतम गुणवत्ता के अनुप्रयोगों को वितरित करने में मदद करता है।',
@@ -37,12 +41,22 @@ class AppLocalizations {
   String get appNameShort {
     return _localizedValues[locale.languageCode]['appNameShort'];
   }
+
+  String get appLang {
+    return _localizedValues[locale.languageCode]['lang'];
+  }
+
   String get title {
     return _localizedValues[locale.languageCode]['title'];
   }
   String get desc {
     return _localizedValues[locale.languageCode]['desc'];
   }
+
+String get appSecondScreen {
+  return _localizedValues[locale.languageCode]['secondTitle'];
+}
+
 }
 
 class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
